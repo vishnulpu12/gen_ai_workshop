@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CareAssist AI — Health Chat</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+  <div class="overlay" id="overlay"></div>
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>
+        </svg>
+        <span>CareAssist AI</span>
+      </div>
+      <button class="icon-btn only-mobile" id="closeSidebar" aria-label="Close sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="sidebar-scroll">
+      <button class="new-btn" id="newChat">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        New Consultation
+      </button>
+
+      <h3 class="section-title">Recent Consultations</h3>
+      <div id="recentList"></div>
+
+      <h3 class="section-title">Medical Records</h3>
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>
+        <span class="t">Lab Results</span>
+      </button>
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+        <span class="t">Prescriptions</span>
+      </button>
+    </div>
+
+    <div class="sidebar-foot">
+      <label class="label" for="apiKey">API Configuration</label>
+      <input class="key-input" id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Enter Gemini API Key..." />
+      <p class="hint">Stored only in this browser (localStorage).</p>
+
+      <button class="profile">
+        <div class="avatar-sm">SJ</div>
+        <div>
+          <div class="name">Sarah Jenkins</div>
+          <div class="role">Patient Settings</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.36.4.66.73.87"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="icon-btn only-mobile" id="openSidebar" aria-label="Open sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <h1>
+          Current Session
+          <span class="pill">Secure &amp; Encrypted</span>
+        </h1>
+      </div>
+      <button class="icon-btn" aria-label="Search">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+    </header>
+
+    <div class="messages" id="messages">
+      <div class="messages-inner" id="messagesInner"></div>
+    </div>
+
+    <div class="disclaimer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <span>AI-generated information is for educational purposes and does not replace professional medical advice.</span>
+    </div>
+
+    <div class="composer">
+      <div class="composer-inner">
+        <div class="input-shell">
+          <button class="attach" title="Attach Medical Record" aria-label="Attach">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <textarea id="input" rows="1" placeholder="Describe your symptoms or ask about your records..."></textarea>
+          <button class="send" id="send" aria-label="Send message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ RIGHT PANEL ============ -->
+  <aside class="rightpanel">
+    <div class="rp-head">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Patient Context
+      </h2>
+    </div>
+
+    <div class="card demo-card">
+      <div class="grid2">
+        <div><p class="k">Age / Gender</p><p class="v">42y, F</p></div>
+        <div><p class="k">Blood Type</p><p class="v">O+</p></div>
+        <div><p class="k">Height</p><p class="v">5'6"</p></div>
+        <div><p class="k">Weight</p><p class="v">145 lbs</p></div>
+      </div>
+    </div>
+
+    <div class="rp-section">
+      <h3 class="section-title" style="margin:0 0 12px">Latest Vitals</h3>
+      <div class="vital"><div class="vital-l"><div class="vital-ico">♥</div><span>Heart Rate</span></div><span class="vital-v">72 bpm</span></div>
+      <div class="vital"><div class="vital-l"><div class="vital-ico">∿</div><span>Blood Pressure</span></div><span class="vital-v">118/76</span></div>
+      <div class="vital"><div class="vital-l"><div class="vital-ico">🌡</div><span>Temperature</span></div><span class="vital-v">98.6°F</span></div>
+    </div>
+
+    <div class="rp-section" style="flex:1">
+      <h3 class="section-title" style="margin:0 0 12px">Quick Actions</h3>
+      <div id="quickActions"></div>
+    </div>
+  </aside>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
